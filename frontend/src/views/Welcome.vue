@@ -120,6 +120,7 @@ import request from '@/utils/request'
 const user = getUserInfo()
 const role = ref(user?.role || '')
 const loading = ref(true)
+const realName = ref('')
 
 const pickupList = ref([])
 const unpaidCount = ref(0)
@@ -134,11 +135,10 @@ const cards = reactive([
   { label: '未处理异常', value: 0, color: '#f56c6c' }
 ])
 
-const roleNameMap = { REGULAR: '用户', COURIER: '快递员', MANAGER: '管理员' }
 const greeting = computed(() => {
-  const name = roleNameMap[role.value] || '用户'
+  const name = realName.value || user?.username || '用户'
   const hour = new Date().getHours()
-  const prefix = hour < 12 ? '早上好' : hour < 18 ? '下午好' : '晚上好'
+  const prefix = hour < 6 ? '夜深了' : hour < 9 ? '早上好' : hour < 12 ? '上午好' : hour < 14 ? '中午好' : hour < 18 ? '下午好' : hour < 22 ? '晚上好' : '夜深了'
   return `${prefix}，${name}`
 })
 
@@ -194,6 +194,10 @@ const handleProxySubmit = async () => {
 
 onMounted(async () => {
   loading.value = true
+  try {
+    const userRes = await request.get('/auth/current')
+    if (userRes.data?.realName) realName.value = userRes.data.realName
+  } catch {}
   try {
     if (role.value === 'REGULAR') {
       fetchPickupCodes()

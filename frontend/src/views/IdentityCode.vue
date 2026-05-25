@@ -65,7 +65,7 @@ onMounted(async () => {
 
 <style scoped>
 .identity-content { padding: 0; }
-.identity-card { margin-top: 20px; max-width: 420px; }
+.identity-card { margin-top: 20px; }
 .card-title { font-size: 16px; font-weight: bold; }
 .desc-section { margin-bottom: 20px; }
 .barcode-wrap { text-align: center; }

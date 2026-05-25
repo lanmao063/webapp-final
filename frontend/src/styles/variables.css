@@ -1,9 +1,10 @@
 /* === Design Tokens === */
 :root {
-  /* Brand / Primary */
-  --color-primary: #409eff;
-  --color-primary-light: #ecf5ff;
-  --color-primary-dark: #337ecc;
+  /* Brand / Primary — Deep Blue #3654A2 */
+  --color-primary: #3654a2;
+  --color-primary-light: #eaeff7;
+  --color-primary-dark: #2a437f;
+  --color-primary-rgb: 54, 84, 162;
 
   /* Neutral grays */
   --color-bg-page: #f0f2f5;
@@ -27,7 +28,7 @@
   /* Shadows */
   --shadow-card: 0 1px 3px rgba(0, 0, 0, .06);
   --shadow-card-hover: 0 4px 12px rgba(0, 0, 0, .08);
-  --shadow-header: 0 1px 4px rgba(0, 0, 0, .06);
+  --shadow-header: 0 1px 4px rgba(0, 0, 0, .08);
 
   /* Spacing */
   --spacing-xs: 4px;

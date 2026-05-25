@@ -85,11 +85,14 @@
           </el-menu>
         </el-aside>
         <el-main class="layout-main">
-          <router-view v-slot="{ Component, route: r }">
-            <transition name="page-fade" mode="out-in">
-              <component :is="Component" :key="r.path" />
-            </transition>
-          </router-view>
+          <div class="main-bg" :style="{ backgroundImage: `url(${bgImage})` }"></div>
+          <div class="main-content">
+            <router-view v-slot="{ Component, route: r }">
+              <transition name="page-fade" mode="out-in">
+                <component :is="Component" :key="r.path" />
+              </transition>
+            </router-view>
+          </div>
         </el-main>
       </el-container>
     </el-container>
@@ -102,6 +105,7 @@ import { useRouter, useRoute } from 'vue-router'
 import { getUserInfo, clearAuth } from '@/utils/auth'
 import request from '@/utils/request'
 import { getAvatarUrl } from '@/utils/avatar'
+import { getRandomBackground } from '@/utils/background'
 import {
   Monitor, HomeFilled, Van, Search, Postcard, Promotion, Document,
   Money, Warning, CirclePlus, Box, DataAnalysis, Checked, List,
@@ -120,6 +124,8 @@ const roleLabel = ref(roleLabelMap[role.value] || '')
 
 const isCollapse = ref(false)
 const toggleCollapse = () => { isCollapse.value = !isCollapse.value }
+
+const bgImage = getRandomBackground()
 
 const isMobile = ref(false)
 let resizeHandler = null
@@ -164,16 +170,16 @@ const logout = async () => {
   height: 100%;
 }
 
-/* === Header === */
+/* === Header — Deep Blue === */
 .layout-header {
   height: var(--header-height) !important;
-  background: var(--color-bg-card);
-  color: var(--color-text-primary);
+  background: var(--color-primary);
+  color: #fff;
   font-size: var(--font-size-lg);
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: var(--shadow-header);
+  box-shadow: 0 1px 6px rgba(var(--color-primary-rgb), .3);
   padding: 0 var(--spacing-lg);
   z-index: 100;
 }
@@ -184,19 +190,19 @@ const logout = async () => {
 }
 .collapse-btn {
   cursor: pointer;
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, .7);
   transition: color var(--transition-fast);
 }
 .collapse-btn:hover {
-  color: var(--color-primary);
+  color: #fff;
 }
 .header-logo {
-  color: var(--color-primary);
+  color: rgba(255, 255, 255, .9);
 }
 .header-title {
   font-size: 20px;
   font-weight: 600;
-  color: var(--color-text-primary);
+  color: #fff;
   white-space: nowrap;
 }
 .header-right {
@@ -210,7 +216,7 @@ const logout = async () => {
 }
 .header-user {
   font-size: var(--font-size-sm);
-  color: var(--color-text-secondary);
+  color: rgba(255, 255, 255, .75);
   white-space: nowrap;
 }
 
@@ -221,6 +227,7 @@ const logout = async () => {
 .layout-aside {
   transition: width var(--transition-slow);
   overflow: hidden;
+  background: var(--color-bg-card);
 }
 .sidebar-menu {
   height: 100%;
@@ -230,7 +237,6 @@ const logout = async () => {
   width: 220px;
 }
 
-/* Light sidebar overrides */
 .sidebar-menu .el-sub-menu__title,
 .sidebar-menu .el-menu-item {
   color: var(--color-text-regular);
@@ -245,17 +251,41 @@ const logout = async () => {
   background-color: var(--color-bg-hover);
 }
 
-/* Settings pinned to bottom */
 .menu-settings {
   position: absolute !important;
   bottom: 0;
   width: 100%;
 }
 
-/* === Main === */
+/* === Main with Background === */
 .layout-main {
-  background: var(--color-bg-page);
+  position: relative;
   padding: var(--spacing-lg);
   overflow-y: auto;
+  background: #e8ecf1;
+}
+
+/* Blurred background layer */
+.main-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  filter: blur(10px);
+  transform: scale(1.05);
+  z-index: 0;
+}
+.main-bg::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, .05);
+}
+
+/* Content above background */
+.main-content {
+  position: relative;
+  z-index: 1;
 }
 </style>

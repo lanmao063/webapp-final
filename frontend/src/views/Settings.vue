@@ -140,7 +140,6 @@ const handleSave = async () => {
 <style scoped>
 .settings-card {
   margin-top: 20px;
-  max-width: 500px;
 }
 .card-header-text {
   font-size: var(--font-size-lg);

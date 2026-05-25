@@ -60,5 +60,5 @@ const handleSubmit = async () => {
 <style scoped>
 .page-container { padding: 0; }
 .breadcrumb { margin-bottom: 16px; }
-.form-card { max-width: 550px; }
+.form-card { }
 </style>

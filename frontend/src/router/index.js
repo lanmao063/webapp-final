@@ -21,6 +21,12 @@ const routes = [
     meta: { noAuth: true }
   },
   {
+    path: '/public-checkout',
+    name: 'PublicCheckout',
+    component: () => import('../views/PublicCheckout.vue'),
+    meta: { noAuth: true }
+  },
+  {
     path: '/admin/data-init',
     name: 'AdminDataInit',
     component: () => import('../views/AdminDataInit.vue'),
