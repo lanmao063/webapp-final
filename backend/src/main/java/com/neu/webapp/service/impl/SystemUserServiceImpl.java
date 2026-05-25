@@ -1,6 +1,7 @@
 package com.neu.webapp.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.neu.webapp.dto.ForgotPasswordRequest;
 import com.neu.webapp.dto.LoginRequest;
@@ -8,26 +9,25 @@ import com.neu.webapp.dto.RegisterRequest;
 import com.neu.webapp.entity.SystemUser;
 import com.neu.webapp.exception.BusinessException;
 import com.neu.webapp.mapper.SystemUserMapper;
-import com.neu.webapp.security.JwtUtil;
 import com.neu.webapp.service.SystemUserService;
 import com.neu.webapp.vo.LoginResponse;
 import com.neu.webapp.vo.UserInfo;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class SystemUserServiceImpl extends ServiceImpl<SystemUserMapper, SystemUser> implements SystemUserService {
 
     private final BCryptPasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
 
-    public SystemUserServiceImpl(BCryptPasswordEncoder passwordEncoder, JwtUtil jwtUtil) {
+    public SystemUserServiceImpl(BCryptPasswordEncoder passwordEncoder) {
         this.passwordEncoder = passwordEncoder;
-        this.jwtUtil = jwtUtil;
     }
 
     @Override
-    public LoginResponse login(LoginRequest request) {
+    public LoginResponse login(LoginRequest request, HttpSession session) {
         SystemUser user = baseMapper.selectOne(
                 new QueryWrapper<SystemUser>().eq("username", request.getUsername())
         );
@@ -40,8 +40,10 @@ public class SystemUserServiceImpl extends ServiceImpl<SystemUserMapper, SystemU
         if (user.getStatus() == 0) {
             throw new BusinessException("账号已被禁用");
         }
-        String token = jwtUtil.generateToken(user.getId(), user.getUsername(), user.getRole(), request.isRememberMe());
-        return new LoginResponse(token, user.getId(), user.getUsername(), user.getRole());
+        session.setAttribute("userId", user.getId());
+        session.setAttribute("username", user.getUsername());
+        session.setAttribute("role", user.getRole());
+        return new LoginResponse(user.getId(), user.getUsername(), user.getRole());
     }
 
     @Override
@@ -89,6 +91,27 @@ public class SystemUserServiceImpl extends ServiceImpl<SystemUserMapper, SystemU
         info.setRealName(user.getRealName());
         info.setPhone(user.getPhone());
         info.setIdNumber(user.getIdNumber());
+        info.setAddress(user.getAddress());
+        info.setAvatar(user.getAvatar());
         return info;
+    }
+
+    @Override
+    @Transactional
+    public void updateProfile(Long userId, String realName, String phone, String address, String avatar) {
+        SystemUser user = baseMapper.selectById(userId);
+        if (user == null) {
+            throw new BusinessException("用户不存在");
+        }
+        if (phone == null || phone.isBlank()) {
+            throw new BusinessException("手机号不能为空");
+        }
+        LambdaUpdateWrapper<SystemUser> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(SystemUser::getId, userId)
+                .set(SystemUser::getRealName, realName)
+                .set(SystemUser::getPhone, phone)
+                .set(SystemUser::getAddress, address)
+                .set(avatar != null, SystemUser::getAvatar, avatar);
+        baseMapper.update(null, wrapper);
     }
 }

@@ -4,7 +4,7 @@ public class Result<T> {
     private int code;
     private String message;
     private T data;
-
+//泛型Result<T>是前后端交互的标准格式，code表示状态码，message表示消息，data表示数据
     private Result(int code, String message, T data) {
         this.code = code;
         this.message = message;
@@ -13,7 +13,7 @@ public class Result<T> {
 
     public static <T> Result<T> ok(T data) {
         return new Result<>(200, "success", data);
-    }//成功的结果，默认状态码200，消息为"success"，数据由调用者提供，用于查
+    }//成功的结果，默认状态码200，消息为"success"，数据由调用者提供，用于查询
 
     public static <T> Result<T> ok() {
         return new Result<>(200, "success", null);

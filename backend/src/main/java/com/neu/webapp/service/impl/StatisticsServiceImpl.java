@@ -35,16 +35,16 @@ public class StatisticsServiceImpl implements StatisticsService {
                 new QueryWrapper<InboundPackage>().eq("status", "IN_WAREHOUSE"));
         Long totalCheckedOut = inboundPackageMapper.selectCount(
                 new QueryWrapper<InboundPackage>().eq("status", "CHECKED_OUT"));
-        Long totalInbound = inboundPackageMapper.selectCount(null);
         Long unresolvedErrors = errorParcelMapper.selectCount(
                 new QueryWrapper<ErrorParcel>().eq("status", "UNRESOLVED"));
-        Long totalSendPackages = sendPackageMapper.selectCount(null);
+
+        Long totalCollected = sendPackageMapper.selectCount(
+                new QueryWrapper<SendPackage>().eq("status", "COLLECTED"));
 
         stats.put("totalInWarehouse", totalInWarehouse);
         stats.put("totalPickedUp", totalCheckedOut);
-        stats.put("totalParcels", totalInbound);
+        stats.put("totalCollected", totalCollected);
         stats.put("unresolvedErrors", unresolvedErrors);
-        stats.put("totalSendPackages", totalSendPackages);
         return stats;
     }
 

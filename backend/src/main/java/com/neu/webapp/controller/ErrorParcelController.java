@@ -3,8 +3,8 @@ package com.neu.webapp.controller;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.neu.webapp.common.Result;
 import com.neu.webapp.entity.ErrorParcel;
-import com.neu.webapp.security.UserContext;
 import com.neu.webapp.service.ErrorParcelService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -20,8 +20,8 @@ public class ErrorParcelController {
     }
 
     @PostMapping
-    public Result<ErrorParcel> register(@RequestBody Map<String, String> body) {
-        String username = UserContext.getCurrentUsername();
+    public Result<ErrorParcel> register(@RequestBody Map<String, String> body, HttpSession session) {
+        String username = (String) session.getAttribute("username");
         return Result.ok(errorParcelService.registerError(
                 body.get("trackingNumber"),
                 body.get("errorType"),
@@ -39,8 +39,8 @@ public class ErrorParcelController {
     }
 
     @PutMapping("/{id}/handle")
-    public Result<?> handle(@PathVariable Long id, @RequestBody Map<String, String> body) {
-        String username = UserContext.getCurrentUsername();
+    public Result<?> handle(@PathVariable Long id, @RequestBody Map<String, String> body, HttpSession session) {
+        String username = (String) session.getAttribute("username");
         errorParcelService.handleError(id, username, body.get("handleResult"));
         return Result.ok();
     }
@@ -48,8 +48,9 @@ public class ErrorParcelController {
     @GetMapping("/my-list")
     public Result<IPage<ErrorParcel>> myList(
             @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        String username = UserContext.getCurrentUsername();
+            @RequestParam(defaultValue = "10") int size,
+            HttpSession session) {
+        String username = (String) session.getAttribute("username");
         return Result.ok(errorParcelService.myErrors(username, page, size));
     }
 }

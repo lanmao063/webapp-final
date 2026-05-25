@@ -16,3 +16,4 @@ public class MybatisPlusConfig {
         return interceptor;
     }
 }
+//这是MyBatis-Plus的配置类，定义了一个MybatisPlusInterceptor Bean，添加了一个PaginationInnerInterceptor用于分页查询，指定数据库类型为MySQL

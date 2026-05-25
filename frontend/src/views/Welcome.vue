@@ -2,6 +2,16 @@
   <div class="welcome-container">
     <!-- REGULAR: 普通用户 - 我的取件码 -->
     <template v-if="role === 'REGULAR'">
+      <div style="width:100%;max-width:950px;margin-bottom:20px;">
+        <el-carousel height="180px" trigger="click">
+          <el-carousel-item v-for="i in 1" :key="i">
+            <div class="carousel-placeholder">
+              <el-icon :size="36"><Picture /></el-icon>
+              <p>走马灯区域 — 待添加内容</p>
+            </div>
+          </el-carousel-item>
+        </el-carousel>
+      </div>
       <el-row :gutter="20" style="width:100%;max-width:950px;margin-bottom:20px;" v-if="unpaidCount > 0">
         <el-col :span="24">
           <el-card shadow="hover" class="hint-card" @click="$router.push('/MyUnpaid')">
@@ -62,6 +72,16 @@
 
     <!-- COURIER: 快递员 - 统计卡片 -->
     <template v-if="role === 'COURIER'">
+      <div style="width:100%;max-width:600px;margin-bottom:20px;">
+        <el-carousel height="160px" trigger="click">
+          <el-carousel-item v-for="i in 1" :key="i">
+            <div class="carousel-placeholder">
+              <el-icon :size="36"><Picture /></el-icon>
+              <p>走马灯区域 — 待添加内容</p>
+            </div>
+          </el-carousel-item>
+        </el-carousel>
+      </div>
       <el-row :gutter="20" style="width:100%;max-width:600px;margin-bottom:20px;" v-if="pendingCollectCount > 0">
         <el-col :span="24">
           <el-card shadow="hover" class="hint-card" @click="$router.push('/PickupQuery')">
@@ -95,6 +115,16 @@
 
     <!-- MANAGER: 驿站管理员 - 概览卡片 -->
     <template v-if="role === 'MANAGER'">
+      <div style="width:100%;max-width:900px;margin-bottom:20px;">
+        <el-carousel height="160px" trigger="click">
+          <el-carousel-item v-for="i in 1" :key="i">
+            <div class="carousel-placeholder">
+              <el-icon :size="36"><Picture /></el-icon>
+              <p>走马灯区域 — 待添加内容</p>
+            </div>
+          </el-carousel-item>
+        </el-carousel>
+      </div>
       <el-row :gutter="20" style="width:100%;max-width:900px;margin-bottom:20px;" v-if="pendingApprovalCount > 0">
         <el-col :span="24">
           <el-card shadow="hover" class="hint-card" @click="$router.push('/SendManage')">
@@ -142,6 +172,7 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
+import { Picture } from '@element-plus/icons-vue'
 import { getUserInfo } from '@/utils/auth'
 import request from '@/utils/request'
 
@@ -157,7 +188,7 @@ const stats = reactive({ todayDeliveries: 0, todayWarehoused: 0 })
 const cards = reactive([
   { label: '在库包裹', value: 0, color: '#e6a23c' },
   { label: '已出库', value: 0, color: '#67c23a' },
-  { label: '总包裹', value: 0, color: '#409eff' },
+  { label: '已揽收', value: 0, color: '#409eff' },
   { label: '未处理异常', value: 0, color: '#f56c6c' }
 ])
 
@@ -226,7 +257,7 @@ onMounted(() => {
     request.get('/statistics/overview').then(res => {
       cards[0].value = res.data.totalInWarehouse
       cards[1].value = res.data.totalPickedUp
-      cards[2].value = res.data.totalParcels
+      cards[2].value = res.data.totalCollected
       cards[3].value = res.data.unresolvedErrors
     }).catch(() => {})
     request.get('/send-package/pending-list', { params: { page: 1, size: 1 } }).then(res => {
@@ -249,6 +280,20 @@ onMounted(() => {
 .welcome-container h1 {
   font-size: 28px;
   margin-bottom: 16px;
+}
+.carousel-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: #f5f7fa;
+  border-radius: 8px;
+  color: #c0c4cc;
+}
+.carousel-placeholder p {
+  margin-top: 8px;
+  font-size: 14px;
 }
 .hint-card { cursor: pointer; }
 .hint-card:hover { border-color: #409eff; }

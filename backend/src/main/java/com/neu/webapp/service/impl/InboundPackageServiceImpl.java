@@ -212,6 +212,97 @@ public class InboundPackageServiceImpl extends ServiceImpl<InboundPackageMapper,
     }
 
     @Override
+    public Map<String, Object> publicSearch(String trackingNumber, String phone) {
+        Package pkg = packageMapper.selectOne(
+                new QueryWrapper<Package>().eq("tracking_number", trackingNumber));
+        if (pkg == null) {
+            return null;
+        }
+        InboundPackage inbound = baseMapper.selectOne(
+                new QueryWrapper<InboundPackage>().eq("package_id", pkg.getId()));
+        if (inbound == null || !"IN_WAREHOUSE".equals(inbound.getStatus())) {
+            return null;
+        }
+        if (phone == null || phone.isBlank()) {
+            throw new BusinessException("请输入手机号");
+        }
+        String receiverPhone = pkg.getReceiverPhone();
+        String proxyPhone = inbound.getProxyPhone();
+        if (!phone.equals(receiverPhone) && !phone.equals(proxyPhone)) {
+            throw new BusinessException("手机号与收件人或代取人不匹配");
+        }
+        Map<String, Object> item = new LinkedHashMap<>();
+        item.put("id", inbound.getId());
+        item.put("trackingNumber", pkg.getTrackingNumber());
+        item.put("packageName", pkg.getPackageName());
+        item.put("receiverPhone", receiverPhone);
+        item.put("cabinetType", inbound.getCabinetType());
+        item.put("pickupCode", inbound.getPickupCode());
+        item.put("enterTime", inbound.getEnterTime());
+        return item;
+    }
+
+    @Override
+    @Transactional
+    public Map<String, Object> publicCheckout(String trackingNumber, String phone) {
+        Package pkg = packageMapper.selectOne(
+                new QueryWrapper<Package>().eq("tracking_number", trackingNumber));
+        if (pkg == null) {
+            throw new BusinessException("包裹不存在");
+        }
+        InboundPackage inbound = baseMapper.selectOne(
+                new QueryWrapper<InboundPackage>().eq("package_id", pkg.getId()));
+        if (inbound == null) {
+            throw new BusinessException("该包裹未入库");
+        }
+        if (!"IN_WAREHOUSE".equals(inbound.getStatus())) {
+            if ("CHECKED_OUT".equals(inbound.getStatus())) {
+                throw new BusinessException("该包裹已出库");
+            }
+            throw new BusinessException("该包裹未入库，请先完成入库操作");
+        }
+        if (phone == null || phone.isBlank()) {
+            throw new BusinessException("请输入手机号");
+        }
+        String receiverPhone = pkg.getReceiverPhone();
+        if (receiverPhone == null) {
+            throw new BusinessException("该包裹收件人信息缺失，无法验证取件权限");
+        }
+        String proxyPhone = inbound.getProxyPhone();
+        if (!phone.equals(receiverPhone) && !phone.equals(proxyPhone)) {
+            throw new BusinessException("该包裹收件人手机号与输入的手机号不匹配，这不是您的包裹");
+        }
+
+        inbound.setStatus("CHECKED_OUT");
+        inbound.setOutTime(LocalDateTime.now());
+        baseMapper.updateById(inbound);
+
+        // 查询同一收件人仍在库的包裹
+        List<InboundPackage> remainingInbounds = baseMapper.selectList(
+                new QueryWrapper<InboundPackage>().eq("status", "IN_WAREHOUSE"));
+        List<Map<String, Object>> remainingPackages = new ArrayList<>();
+        for (InboundPackage ib : remainingInbounds) {
+            if (ib.getId().equals(inbound.getId())) continue;
+            Package rp = packageMapper.selectById(ib.getPackageId());
+            if (rp != null && receiverPhone.equals(rp.getReceiverPhone())) {
+                Map<String, Object> item = new LinkedHashMap<>();
+                item.put("trackingNumber", rp.getTrackingNumber());
+                item.put("pickupCode", ib.getPickupCode());
+                remainingPackages.add(item);
+            }
+        }
+
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("trackingNumber", pkg.getTrackingNumber());
+        result.put("packageName", pkg.getPackageName());
+        result.put("pickupCode", inbound.getPickupCode());
+        result.put("cabinetType", inbound.getCabinetType());
+        result.put("remainingCount", remainingPackages.size());
+        result.put("remainingPackages", remainingPackages);
+        return result;
+    }
+
+    @Override
     public IPage<Map<String, Object>> searchAutoCheckout(String keyword, int page, int size) {
         QueryWrapper<InboundPackage> wrapper = new QueryWrapper<>();
         wrapper.eq("is_auto_checkout", 1);

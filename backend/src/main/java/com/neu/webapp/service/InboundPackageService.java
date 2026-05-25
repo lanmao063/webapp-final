@@ -20,4 +20,8 @@ public interface InboundPackageService extends IService<InboundPackage> {
     Map<String, Object> searchByTrackingNumber(String trackingNumber, Long userId);
 
     IPage<Map<String, Object>> searchAutoCheckout(String keyword, int page, int size);
+
+    Map<String, Object> publicSearch(String trackingNumber, String phone);
+
+    Map<String, Object> publicCheckout(String trackingNumber, String phone);
 }

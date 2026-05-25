@@ -82,7 +82,7 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import request from '@/utils/request'
 
 const searchForm = reactive({ keyword: '' })
@@ -90,13 +90,8 @@ const tableData = ref([])
 const pagination = reactive({ currentPage: 1, pageSize: 10, total: 0 })
 
 const fetchData = async () => {
-  const kw = searchForm.keyword.trim()
-  if (!kw) {
-    tableData.value = []
-    pagination.total = 0
-    return
-  }
   try {
+    const kw = searchForm.keyword.trim()
     const res = await request.get('/package/search', {
       params: {
         keyword: kw,
@@ -122,8 +117,10 @@ const highlightMatch = (text, keyword) => {
   return escaped.replace(regex, '<mark class="highlight">$1</mark>')
 }
 
+onMounted(() => fetchData())
+
 const handleSearch = () => { pagination.currentPage = 1; fetchData() }
-const handleReset = () => { searchForm.keyword = ''; tableData.value = []; pagination.total = 0 }
+const handleReset = () => { searchForm.keyword = ''; pagination.currentPage = 1; fetchData() }
 </script>
 
 <style scoped>

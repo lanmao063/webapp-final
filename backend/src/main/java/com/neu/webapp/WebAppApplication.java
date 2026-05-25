@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-@EnableScheduling
+@EnableScheduling//启用定时任务功能
 public class WebAppApplication {
 
     public static void main(String[] args) {
@@ -13,3 +13,4 @@ public class WebAppApplication {
     }
 
 }
+//此处是Spring Boot应用程序的入口类，用于启动应用程序

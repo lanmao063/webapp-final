@@ -1,6 +1,6 @@
 package com.neu.webapp.config;
 
-import com.neu.webapp.security.JwtInterceptor;
+import com.neu.webapp.security.SessionInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
@@ -9,10 +9,10 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebMvcConfig implements WebMvcConfigurer {
 
-    private final JwtInterceptor jwtInterceptor;
+    private final SessionInterceptor sessionInterceptor;
 
-    public WebMvcConfig(JwtInterceptor jwtInterceptor) {
-        this.jwtInterceptor = jwtInterceptor;
+    public WebMvcConfig(SessionInterceptor sessionInterceptor) {
+        this.sessionInterceptor = sessionInterceptor;
     }
 
     @Override
@@ -26,8 +26,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(jwtInterceptor)
+        registry.addInterceptor(sessionInterceptor)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/auth/login", "/auth/register", "/auth/forgot-password", "/admin/**");
+                .excludePathPatterns("/auth/login", "/auth/register", "/auth/forgot-password", "/admin/**",
+                        "/inbound/public-search", "/inbound/public-checkout");
     }
 }

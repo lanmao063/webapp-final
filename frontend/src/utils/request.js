@@ -1,22 +1,12 @@
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
-import { getToken, clearToken } from './auth'
+import { clearAuth } from './auth'
 
 const request = axios.create({
   baseURL: '/webapp',
-  timeout: 15000
+  timeout: 15000,
+  withCredentials: true
 })
-
-request.interceptors.request.use(
-  config => {
-    const token = getToken()
-    if (token) {
-      config.headers['Authorization'] = 'Bearer ' + token
-    }
-    return config
-  },
-  error => Promise.reject(error)
-)
 
 request.interceptors.response.use(
   response => {
@@ -29,7 +19,7 @@ request.interceptors.response.use(
   },
   error => {
     if (error.response && error.response.status === 401) {
-      clearToken()
+      clearAuth()
       ElMessage.error('登录已过期，请重新登录')
       window.location.href = '/#/login'
     } else {

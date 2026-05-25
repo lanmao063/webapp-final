@@ -11,16 +11,19 @@ public class SendPackage {
 
     @TableId(type = IdType.AUTO)
     private Long id;
-    private Long packageId;
+    private Long packageId;//快递单号
     private Double fee;
     private Integer isPaid;
     private String pickupMethod;
     private String appointmentTime;
     private String status;
     private Long createdBy;
-    private Long courierId;
+    private Long courierId;//配送员ID
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private LocalDateTime approvedAt;
+    private LocalDateTime paidAt;
+    private LocalDateTime collectedAt;
 
     // Transient fields from package table (for frontend display)
     @TableField(exist = false)
@@ -84,6 +87,12 @@ public class SendPackage {
     public void setReceiverPhone(String receiverPhone) { this.receiverPhone = receiverPhone; }
     public String getReceiverAddress() { return receiverAddress; }
     public void setReceiverAddress(String receiverAddress) { this.receiverAddress = receiverAddress; }
+    public LocalDateTime getApprovedAt() { return approvedAt; }
+    public void setApprovedAt(LocalDateTime approvedAt) { this.approvedAt = approvedAt; }
+    public LocalDateTime getPaidAt() { return paidAt; }
+    public void setPaidAt(LocalDateTime paidAt) { this.paidAt = paidAt; }
+    public LocalDateTime getCollectedAt() { return collectedAt; }
+    public void setCollectedAt(LocalDateTime collectedAt) { this.collectedAt = collectedAt; }
     public String getNotes() { return notes; }
     public void setNotes(String notes) { this.notes = notes; }
 }

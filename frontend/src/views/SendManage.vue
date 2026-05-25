@@ -26,8 +26,9 @@
         <el-table-column prop="appointmentTime" label="预约时间" width="130">
           <template #default="{ row }">{{ row.appointmentTime || '-' }}</template>
         </el-table-column>
-        <el-table-column label="操作" width="180" fixed="right">
+        <el-table-column label="操作" width="240" fixed="right">
           <template #default="{ row }">
+            <el-button type="primary" size="small" link @click="$router.push(`/SendDetail?id=${row.id}`)">详情</el-button>
             <el-button type="success" size="small" link @click="openApprove(row)">同意</el-button>
             <el-button type="danger" size="small" link @click="handleReject(row)">拒绝</el-button>
           </template>

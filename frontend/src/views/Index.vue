@@ -7,6 +7,9 @@
                 <h1>驿站管理系统</h1>
             </div>
             <div class="header-right" style="display: flex;align-items: center;margin-right: 30px;">
+                <el-avatar :src="avatarSrc" :size="36" style="cursor:pointer;margin-right:10px;" @click="goSettings">
+                  {{ avatarSrc ? '' : username.charAt(0) }}
+                </el-avatar>
                 <p>当前用户：{{ username }}（{{ roleLabel }}）</p>
                 <el-button type="danger" size="small" style="margin-left: 10px;" @click="logout">退出系统</el-button>
             </div>
@@ -23,7 +26,7 @@
                             <template #title><el-icon><Van /></el-icon><span>快递服务</span></template>
                             <el-menu-item index="/Welcome"><el-icon><HomeFilled /></el-icon><span>首页</span></el-menu-item>
                             <el-menu-item index="/ParcelTrack"><el-icon><Search /></el-icon><span>查件</span></el-menu-item>
-                            <el-menu-item index="/ParcelPickup"><el-icon><Finished /></el-icon><span>取件</span></el-menu-item>
+                            <el-menu-item index="/IdentityCode"><el-icon><Postcard /></el-icon><span>身份码</span></el-menu-item>
                             <el-menu-item index="/ParcelSend"><el-icon><Promotion /></el-icon><span>寄件</span></el-menu-item>
                         </el-sub-menu>
                         <el-sub-menu index="order-mgmt">
@@ -70,6 +73,10 @@
                         </el-sub-menu>
                     </template>
 
+                    <el-menu-item index="/Settings" style="position: absolute; bottom: 0; width: 100%;">
+                        <el-icon><Setting /></el-icon><span>设置</span>
+                    </el-menu-item>
+
                 </el-menu>
             </el-aside>
             <el-main>
@@ -81,22 +88,47 @@
 </template>
 
 <script setup>
-    import { ref } from 'vue'
+    import { ref, onMounted, onUnmounted } from 'vue'
     import { useRouter, useRoute } from 'vue-router'
-    import { getUserInfo, clearToken } from '@/utils/auth'
-    import { Monitor, HomeFilled, Van, Search, Finished, Promotion, Document, Money, Warning, CirclePlus, Box, DataAnalysis, Checked, List, DataBoard, EditPen, Clock } from '@element-plus/icons-vue'
+    import { getUserInfo, clearAuth } from '@/utils/auth'
+    import request from '@/utils/request'
+    import { getAvatarUrl } from '@/utils/avatar'
+    import { Monitor, HomeFilled, Van, Search, Postcard, Promotion, Document, Money, Warning, CirclePlus, Box, DataAnalysis, Checked, List, DataBoard, EditPen, Clock, Setting } from '@element-plus/icons-vue'
 
     const router = useRouter()
     const route = useRoute()
     const user = getUserInfo()
     const username = ref(user?.username || '')
     const role = ref(user?.role || '')
+    const avatarSrc = ref('')
 
     const roleLabelMap = { REGULAR: '普通用户', COURIER: '快递员', MANAGER: '驿站管理员' }
     const roleLabel = ref(roleLabelMap[role.value] || '')
 
-    const logout = () => {
-      clearToken()
+    const fetchAvatar = async () => {
+      try {
+        const res = await request.get('/auth/current')
+        if (res.data.avatar) {
+          const url = getAvatarUrl(res.data.avatar)
+          avatarSrc.value = url || res.data.avatar
+        }
+      } catch {}
+    }
+
+    onMounted(() => {
+      fetchAvatar()
+      window.addEventListener('user-profile-updated', fetchAvatar)
+    })
+
+    onUnmounted(() => {
+      window.removeEventListener('user-profile-updated', fetchAvatar)
+    })
+
+    const goSettings = () => router.push('/Settings')
+
+    const logout = async () => {
+      try { await request.post('/auth/logout') } catch {}
+      clearAuth()
       router.push('/login')
     }
 </script>

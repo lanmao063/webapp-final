@@ -91,6 +91,7 @@
         <el-descriptions-item label="快递单号">{{ result.trackingNumber }}</el-descriptions-item>
         <el-descriptions-item label="费用">￥{{ result.fee }}</el-descriptions-item>
       </el-descriptions>
+      <el-button type="primary" style="margin-top:12px;" @click="$router.push(`/SendDetail?id=${result.id}`)">查看详情</el-button>
     </el-card>
   </div>
 </template>

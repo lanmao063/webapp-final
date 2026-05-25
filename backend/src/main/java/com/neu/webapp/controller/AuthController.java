@@ -4,10 +4,11 @@ import com.neu.webapp.common.Result;
 import com.neu.webapp.dto.ForgotPasswordRequest;
 import com.neu.webapp.dto.LoginRequest;
 import com.neu.webapp.dto.RegisterRequest;
-import com.neu.webapp.security.UserContext;
+import com.neu.webapp.dto.UpdateProfileRequest;
 import com.neu.webapp.service.SystemUserService;
 import com.neu.webapp.vo.LoginResponse;
 import com.neu.webapp.vo.UserInfo;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,8 +23,8 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public Result<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
-        return Result.ok(systemUserService.login(request));
+    public Result<LoginResponse> login(@Valid @RequestBody LoginRequest request, HttpSession session) {
+        return Result.ok(systemUserService.login(request, session));
     }
 
     @PostMapping("/register")
@@ -39,13 +40,21 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public Result<?> logout() {
+    public Result<?> logout(HttpSession session) {
+        session.invalidate();
         return Result.ok();
     }
 
     @GetMapping("/current")
-    public Result<UserInfo> current() {
-        Long userId = UserContext.getCurrentUserId();
+    public Result<UserInfo> current(HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
         return Result.ok(systemUserService.getCurrentUserInfo(userId));
+    }
+
+    @PutMapping("/profile")
+    public Result<?> updateProfile(@RequestBody UpdateProfileRequest request, HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+        systemUserService.updateProfile(userId, request.getRealName(), request.getPhone(), request.getAddress(), request.getAvatar());
+        return Result.ok();
     }
 }

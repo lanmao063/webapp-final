@@ -1,5 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import { getToken, getUserInfo } from '@/utils/auth'
+import { getUserInfo } from '@/utils/auth'
 
 const routes = [
   {
@@ -43,9 +43,9 @@ const routes = [
         meta: { role: 'REGULAR' }
       },
       {
-        path: 'ParcelPickup',
-        name: 'ParcelPickup',
-        component: () => import('../views/ParcelPickup.vue'),
+        path: 'IdentityCode',
+        name: 'IdentityCode',
+        component: () => import('../views/IdentityCode.vue'),
         meta: { role: 'REGULAR' }
       },
       {
@@ -120,6 +120,16 @@ const routes = [
         component: () => import('../views/ParcelDelivery.vue'),
         meta: { role: 'COURIER' }
       },
+      {
+        path: 'SendDetail',
+        name: 'SendDetail',
+        component: () => import('../views/SendDetail.vue')
+      },
+      {
+        path: 'Settings',
+        name: 'Settings',
+        component: () => import('../views/Settings.vue')
+      },
     ]
   },
   {
@@ -134,10 +144,10 @@ const router = createRouter({
 })
 
 router.beforeEach((to, from, next) => {
-  const token = getToken()
+  const user = getUserInfo()
 
   if (to.meta.noAuth) {
-    if (token && to.path === '/login') {
+    if (user && to.path === '/login') {
       next('/Welcome')
     } else {
       next()
@@ -145,13 +155,12 @@ router.beforeEach((to, from, next) => {
     return
   }
 
-  if (!token) {
+  if (!user) {
     next('/login')
     return
   }
 
-  const user = getUserInfo()
-  if (to.meta.role && user && user.role !== to.meta.role) {
+  if (to.meta.role && user.role !== to.meta.role) {
     next('/Welcome')
     return
   }

@@ -1,8 +1,8 @@
 package com.neu.webapp.controller;
 
 import com.neu.webapp.common.Result;
-import com.neu.webapp.security.UserContext;
 import com.neu.webapp.service.StatisticsService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,7 +39,8 @@ public class StatisticsController {
     }
 
     @GetMapping("/courier-overview")
-    public Result<Map<String, Object>> courierOverview() {
-        return Result.ok(statisticsService.getCourierOverview(UserContext.getCurrentUserId()));
+    public Result<Map<String, Object>> courierOverview(HttpSession session) {
+        Long userId = (Long) session.getAttribute("userId");
+        return Result.ok(statisticsService.getCourierOverview(userId));
     }
 }

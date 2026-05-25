@@ -12,3 +12,4 @@ public class PasswordConfig {
         return new BCryptPasswordEncoder();
     }
 }
+//这是一个Spring配置类，定义了一个BCryptPasswordEncoder Bean，用于加密用户密码，增强安全性

@@ -1,42 +1,34 @@
-const TOKEN_KEY = 'parcel_locker_token'
 const USER_KEY = 'parcel_locker_user'
-
-export function getToken() {
-  return localStorage.getItem(TOKEN_KEY) || sessionStorage.getItem(TOKEN_KEY)
-}
-
-export function setToken(token, rememberMe) {
-  if (rememberMe) {
-    localStorage.setItem(TOKEN_KEY, token)
-  } else {
-    sessionStorage.setItem(TOKEN_KEY, token)
-  }
-}
-
-export function clearToken() {
-  localStorage.removeItem(TOKEN_KEY)
-  sessionStorage.removeItem(TOKEN_KEY)
-  localStorage.removeItem(USER_KEY)
-  sessionStorage.removeItem(USER_KEY)
-}
+const REMEMBER_KEY = 'parcel_locker_remember'
 
 export function getUserInfo() {
-  const user = localStorage.getItem(USER_KEY) || sessionStorage.getItem(USER_KEY)
+  const user = sessionStorage.getItem(USER_KEY)
   if (user) {
-    try {
-      return JSON.parse(user)
-    } catch {
-      return null
-    }
+    try { return JSON.parse(user) } catch { return null }
   }
   return null
 }
 
-export function setUserInfo(user, rememberMe) {
-  const data = JSON.stringify(user)
-  if (rememberMe) {
-    localStorage.setItem(USER_KEY, data)
-  } else {
-    sessionStorage.setItem(USER_KEY, data)
+export function setUserInfo(user) {
+  sessionStorage.setItem(USER_KEY, JSON.stringify(user))
+}
+
+export function clearAuth() {
+  sessionStorage.removeItem(USER_KEY)
+}
+
+export function saveCredentials(username, password) {
+  localStorage.setItem(REMEMBER_KEY, JSON.stringify({ username, password }))
+}
+
+export function getSavedCredentials() {
+  const data = localStorage.getItem(REMEMBER_KEY)
+  if (data) {
+    try { return JSON.parse(data) } catch { return null }
   }
+  return null
+}
+
+export function clearCredentials() {
+  localStorage.removeItem(REMEMBER_KEY)
 }

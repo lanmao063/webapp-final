@@ -8,6 +8,8 @@ public class UserInfo {
     private String realName;
     private String phone;
     private String idNumber;
+    private String address;
+    private String avatar;
 
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
@@ -21,4 +23,8 @@ public class UserInfo {
     public void setPhone(String phone) { this.phone = phone; }
     public String getIdNumber() { return idNumber; }
     public void setIdNumber(String idNumber) { this.idNumber = idNumber; }
+    public String getAddress() { return address; }
+    public void setAddress(String address) { this.address = address; }
+    public String getAvatar() { return avatar; }
+    public void setAvatar(String avatar) { this.avatar = avatar; }
 }

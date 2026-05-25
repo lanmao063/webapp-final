@@ -120,6 +120,7 @@ public class SendPackageServiceImpl extends ServiceImpl<SendPackageMapper, SendP
             sp.setAppointmentTime(updateData.getAppointmentTime());
         }
         sp.setStatus("APPROVED");
+        sp.setApprovedAt(LocalDateTime.now());
         // 自动分配快递员
         java.util.List<SystemUser> couriers = systemUserMapper.selectList(
                 new QueryWrapper<SystemUser>().eq("role", "COURIER").eq("status", 1));
@@ -167,6 +168,7 @@ public class SendPackageServiceImpl extends ServiceImpl<SendPackageMapper, SendP
         }
         sp.setStatus("PAID");
         sp.setIsPaid(1);
+        sp.setPaidAt(LocalDateTime.now());
         baseMapper.updateById(sp);
     }
 
@@ -193,6 +195,7 @@ public class SendPackageServiceImpl extends ServiceImpl<SendPackageMapper, SendP
             throw new BusinessException("该订单未分配给您，无法揽收");
         }
         sp.setStatus("COLLECTED");
+        sp.setCollectedAt(LocalDateTime.now());
         baseMapper.updateById(sp);
     }
 

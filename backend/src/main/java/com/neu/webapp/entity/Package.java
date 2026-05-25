@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 public class Package {
 
     @TableId(type = IdType.AUTO)
-    private Long id;
+    private Long id;//自动生成的唯一ID，主键
     private String trackingNumber;
     private String packageName;
     private Double weight;
