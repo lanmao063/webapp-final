@@ -27,12 +27,6 @@ const routes = [
     meta: { noAuth: true }
   },
   {
-    path: '/admin/data-init',
-    name: 'AdminDataInit',
-    component: () => import('../views/AdminDataInit.vue'),
-    meta: { noAuth: true }
-  },
-  {
     path: '/',
     component: () => import('../views/Index.vue'),
     redirect: '/Welcome',

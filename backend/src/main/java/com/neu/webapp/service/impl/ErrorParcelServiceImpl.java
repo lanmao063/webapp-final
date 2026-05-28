@@ -32,7 +32,7 @@ public class ErrorParcelServiceImpl extends ServiceImpl<ErrorParcelMapper, Error
     @Transactional//登记异常
     public ErrorParcel registerError(String trackingNumber, String errorType, String description, String reportedBy) {
         Package pkg = packageMapper.selectOne(
-                new QueryWrapper<Package>().eq("tracking_number", trackingNumber));
+                new QueryWrapper<Package>().eq("tracking_number", trackingNumber));//根据快递单号查询包裹信息
         if (pkg == null) {
             throw new BusinessException("快递单号不存在");
         }
@@ -41,7 +41,7 @@ public class ErrorParcelServiceImpl extends ServiceImpl<ErrorParcelMapper, Error
         error.setErrorType(errorType);
         error.setDescription(description);
         error.setReportedBy(reportedBy);
-        error.setStatus("UNRESOLVED");
+        error.setStatus("UNRESOLVED");//创建并向异常记录中插入数据
         baseMapper.insert(error);
         return error;
     }
@@ -56,7 +56,7 @@ public class ErrorParcelServiceImpl extends ServiceImpl<ErrorParcelMapper, Error
         error.setHandlerName(handlerName);
         error.setHandleResult(handleResult);
         error.setHandleTime(LocalDateTime.now());
-        error.setStatus("RESOLVED");
+        error.setStatus("RESOLVED");//更新异常记录状态和处理结果
         baseMapper.updateById(error);
     }
 
@@ -64,33 +64,33 @@ public class ErrorParcelServiceImpl extends ServiceImpl<ErrorParcelMapper, Error
     public IPage<ErrorParcel> search(String status, int page, int size) {
         QueryWrapper<ErrorParcel> wrapper = new QueryWrapper<>();
         if (status != null && !status.isEmpty()) {
-            wrapper.eq("status", status);
+            wrapper.eq("status", status);//根据状态查询异常记录
         }
         wrapper.orderByDesc("created_at");
-        IPage<ErrorParcel> result = baseMapper.selectPage(new Page<>(page, size), wrapper);
+        IPage<ErrorParcel> result = baseMapper.selectPage(new Page<>(page, size), wrapper);//分页查询
         for (ErrorParcel ep : result.getRecords()) {
             if (ep.getPackageId() != null) {
-                Package pkg = packageMapper.selectById(ep.getPackageId());
+                Package pkg = packageMapper.selectById(ep.getPackageId());//查询异常记录对应的快递单号
                 if (pkg != null) {
-                    ep.setTrackingNumber(pkg.getTrackingNumber());
+                    ep.setTrackingNumber(pkg.getTrackingNumber());//将快递单号设置到异常记录中
                 }
             }
             if (ep.getReportedBy() != null) {
                 SystemUser reporter = systemUserMapper.selectOne(
-                        new QueryWrapper<SystemUser>().eq("username", ep.getReportedBy()));
+                        new QueryWrapper<SystemUser>().eq("username", ep.getReportedBy()));//查询异常记录的举报人信息
                 if (reporter != null) {
-                    ep.setReporterPhone(reporter.getPhone());
+                    ep.setReporterPhone(reporter.getPhone());//将举报人电话设置到异常记录中
                 }
             }
         }
-        return result;
+        return result;//返回给前端查询结果
     }
 
     @Override//用户查询自己提交的异常记录
     public IPage<ErrorParcel> myErrors(String username, int page, int size) {
         QueryWrapper<ErrorParcel> wrapper = new QueryWrapper<>();
-        wrapper.eq("reported_by", username).orderByDesc("created_at");
-        IPage<ErrorParcel> result = baseMapper.selectPage(new Page<>(page, size), wrapper);
+        wrapper.eq("reported_by", username).orderByDesc("created_at");//根据举报人查询异常记录
+        IPage<ErrorParcel> result = baseMapper.selectPage(new Page<>(page, size), wrapper);//分页查询用户提交的异常记录
         for (ErrorParcel ep : result.getRecords()) {
             if (ep.getPackageId() != null) {
                 Package pkg = packageMapper.selectById(ep.getPackageId());

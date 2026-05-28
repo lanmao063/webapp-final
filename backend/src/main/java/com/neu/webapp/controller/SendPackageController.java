@@ -50,10 +50,9 @@ public class SendPackageController {
     }
 
     @PutMapping("/{id}/approve")
-    public Result<Void> approve(@PathVariable Long id, @RequestBody SendPackage updateData, HttpSession session) {
+    public Result<java.util.Map<String, Object>> approve(@PathVariable Long id, @RequestBody SendPackage updateData, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
-        sendPackageService.approve(id, updateData, userId);
-        return Result.ok();
+        return Result.ok(sendPackageService.approve(id, updateData, userId));
     }
 
     @PutMapping("/{id}/reject")

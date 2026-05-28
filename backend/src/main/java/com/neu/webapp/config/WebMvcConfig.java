@@ -28,7 +28,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(sessionInterceptor)
                 .addPathPatterns("/**")
-                .excludePathPatterns("/auth/login", "/auth/register", "/auth/forgot-password", "/admin/**",
+                .excludePathPatterns("/auth/login", "/auth/register", "/auth/forgot-password",
                         "/inbound/public-search", "/inbound/public-checkout");
     }
 }

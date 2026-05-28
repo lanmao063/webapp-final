@@ -13,7 +13,7 @@ public interface SendPackageService extends IService<SendPackage> {
 
     IPage<SendPackage> pendingList(int page, int size);
 
-    void approve(Long id, SendPackage updateData, Long managerId);
+    java.util.Map<String, Object> approve(Long id, SendPackage updateData, Long managerId);
 
     void reject(Long id, Long managerId);
 

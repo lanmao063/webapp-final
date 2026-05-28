@@ -17,9 +17,7 @@ public class SystemUser {
     private String phone;
     private String address;
     private String idNumber;
-    private String message;
     private String avatar;
-    private Integer status;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -39,12 +37,8 @@ public class SystemUser {
     public void setAddress(String address) { this.address = address; }
     public String getIdNumber() { return idNumber; }
     public void setIdNumber(String idNumber) { this.idNumber = idNumber; }
-    public String getMessage() { return message; }
-    public void setMessage(String message) { this.message = message; }
     public String getAvatar() { return avatar; }
     public void setAvatar(String avatar) { this.avatar = avatar; }
-    public Integer getStatus() { return status; }
-    public void setStatus(Integer status) { this.status = status; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }

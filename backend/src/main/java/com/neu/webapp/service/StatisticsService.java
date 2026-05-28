@@ -13,5 +13,7 @@ public interface StatisticsService {
 
     Map<String, Object> getChartData(int year);
 
+    Map<String, Object> getDailyChartData(int year, int month);
+
     Map<String, Object> getCourierOverview(Long courierId);
 }

@@ -103,8 +103,8 @@ public class SendPackageServiceImpl extends ServiceImpl<SendPackageMapper, SendP
     }
 
     @Override
-    @Transactional//审批订单接口，管理员可以审批通过或驳回订单，审批通过后自动分配快递员
-    public void approve(Long id, SendPackage updateData, Long managerId) {
+    @Transactional
+    public java.util.Map<String, Object> approve(Long id, SendPackage updateData, Long managerId) {
         SendPackage sp = baseMapper.selectById(id);
         if (sp == null) {
             throw new BusinessException("订单不存在");
@@ -125,12 +125,19 @@ public class SendPackageServiceImpl extends ServiceImpl<SendPackageMapper, SendP
         sp.setApprovedAt(LocalDateTime.now());
         // 自动分配快递员
         java.util.List<SystemUser> couriers = systemUserMapper.selectList(
-                new QueryWrapper<SystemUser>().eq("role", "COURIER").eq("status", 1));
+                new QueryWrapper<SystemUser>().eq("role", "COURIER"));
+        SystemUser assignedCourier = null;
         if (!couriers.isEmpty()) {
             int index = (int)(Math.random() * couriers.size());
-            sp.setCourierId(couriers.get(index).getId());
+            assignedCourier = couriers.get(index);
+            sp.setCourierId(assignedCourier.getId());
         }
         baseMapper.updateById(sp);
+
+        java.util.Map<String, Object> result = new java.util.LinkedHashMap<>();
+        result.put("courierName", assignedCourier != null ? assignedCourier.getRealName() : null);
+        result.put("courierIdNumber", assignedCourier != null ? assignedCourier.getIdNumber() : null);
+        return result;
     }
 
     @Override
@@ -200,6 +207,15 @@ public class SendPackageServiceImpl extends ServiceImpl<SendPackageMapper, SendP
         sp.setStatus("COLLECTED");
         sp.setCollectedAt(LocalDateTime.now());
         baseMapper.updateById(sp);
+    }
+
+    @Override
+    public SendPackage getById(java.io.Serializable id) {
+        SendPackage sp = super.getById(id);
+        if (sp != null) {
+            fillPackageFields(sp);
+        }
+        return sp;
     }
 
     private void fillPackageFields(SendPackage sp) {

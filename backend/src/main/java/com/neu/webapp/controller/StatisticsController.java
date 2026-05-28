@@ -38,6 +38,13 @@ public class StatisticsController {
         return Result.ok(statisticsService.getChartData(year));
     }
 
+    @GetMapping("/daily-chart")
+    public Result<Map<String, Object>> dailyChart(
+            @RequestParam(defaultValue = "2026") int year,
+            @RequestParam(defaultValue = "5") int month) {
+        return Result.ok(statisticsService.getDailyChartData(year, month));
+    }
+
     @GetMapping("/courier-overview")
     public Result<Map<String, Object>> courierOverview(HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");

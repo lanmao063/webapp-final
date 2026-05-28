@@ -37,9 +37,6 @@ public class SystemUserServiceImpl extends ServiceImpl<SystemUserMapper, SystemU
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new BusinessException("密码错误");
         }
-        if (user.getStatus() == 0) {
-            throw new BusinessException("账号已被禁用");
-        }
         session.setAttribute("userId", user.getId());
         session.setAttribute("username", user.getUsername());
         session.setAttribute("role", user.getRole());
@@ -60,7 +57,6 @@ public class SystemUserServiceImpl extends ServiceImpl<SystemUserMapper, SystemU
         user.setRole(request.getRole());
         user.setPhone(request.getPhone());
         user.setIdNumber(request.getIdNumber());
-        user.setStatus(1);
         baseMapper.insert(user);
     }
 

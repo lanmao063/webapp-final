@@ -10,8 +10,6 @@ CREATE TABLE IF NOT EXISTS system_user (
     phone       VARCHAR(20),
     address     VARCHAR(200),
     id_number   VARCHAR(18)  COMMENT '快递员/分拣员工号',
-    message     VARCHAR(500),
-    status      TINYINT DEFAULT 1,
     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_role (role),

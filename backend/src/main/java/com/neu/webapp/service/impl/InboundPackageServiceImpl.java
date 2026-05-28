@@ -33,12 +33,12 @@ public class InboundPackageServiceImpl extends ServiceImpl<InboundPackageMapper,
     @Transactional
     public String warehouseEntry(String trackingNumber, Long courierId) {
         Package pkg = packageMapper.selectOne(
-                new QueryWrapper<Package>().eq("tracking_number", trackingNumber));
+                new QueryWrapper<Package>().eq("tracking_number", trackingNumber));//根据快递单号查询包裹信息，看看包裹是否存在
         if (pkg == null) {
             throw new BusinessException("快递单号不存在，请先录入包裹信息");
         }
         InboundPackage inbound = baseMapper.selectOne(
-                new QueryWrapper<InboundPackage>().eq("package_id", pkg.getId()));
+                new QueryWrapper<InboundPackage>().eq("package_id", pkg.getId()));//查询是否已入库
         if (inbound == null) {
             throw new BusinessException("该包裹未预录入入库信息");
         }
@@ -47,7 +47,7 @@ public class InboundPackageServiceImpl extends ServiceImpl<InboundPackageMapper,
         }//校验包裹状态
 
         // 根据体积确定柜型 → 生成取件码
-        double volume = pkg.getVolume() != null ? pkg.getVolume() : 0;
+        double volume = pkg.getVolume() != null ? pkg.getVolume() : 0;//检查体积信息是否存在，存在则使用，不存在则默认为0，避免空指针异常
         String cabinetType;
         int cabinetNum;
 
@@ -65,7 +65,7 @@ public class InboundPackageServiceImpl extends ServiceImpl<InboundPackageMapper,
         String pickupCode = String.format("%02d-%d-%04d",
                 cabinetNum,
                 (int)(Math.random() * 5) + 1,//1-5
-                (int)(Math.random() * 9000) + 1000);
+                (int)(Math.random() * 9000) + 1000);//生成格式为XX-Y-ZZZZ的取件码，XX为柜号，Y为柜型，ZZZZ为随机4位数
 
         inbound.setPickupCode(pickupCode);
         inbound.setCabinetType(cabinetType);

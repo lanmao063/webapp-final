@@ -111,13 +111,17 @@ const openApprove = (row) => {
 const handleApprove = async () => {
   loading.value = true
   try {
-    await request.put(`/send-package/${approveForm.id}/approve`, {
+    const res = await request.put(`/send-package/${approveForm.id}/approve`, {
       weight: approveForm.weight,
       fee: calcFee(approveForm.weight),
       pickupMethod: approveForm.pickupMethod,
       appointmentTime: approveForm.pickupMethod === 'DOOR_PICKUP' ? approveForm.appointmentTime : null
     })
-    ElMessage.success('审核通过')
+    const { courierName, courierIdNumber } = res.data
+    const msg = courierName
+      ? `审核通过，揽收任务已分配给快递员 ${courierName}（工号：${courierIdNumber || '-'}）`
+      : '审核通过（当前无可用快递员）'
+    ElMessage.success(msg)
     dialogVisible.value = false
     fetchData()
   } catch {} finally { loading.value = false }

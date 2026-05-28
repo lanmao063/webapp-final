@@ -1,1 +1,0 @@
-ALTER TABLE system_user MODIFY COLUMN avatar MEDIUMTEXT COMMENT '头像图片路径或Base64数据';

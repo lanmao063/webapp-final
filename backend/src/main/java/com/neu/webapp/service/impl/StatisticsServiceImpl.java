@@ -136,5 +136,46 @@ public class StatisticsServiceImpl implements StatisticsService {
         chart.put("enterData", enterData);
         chart.put("pickupData", pickupData);
         return chart;
-    }//生成图表数据接口，前端调用后直接渲染柱状图
+    }//生成月度图表数据接口，前端调用后直接渲染柱状图
+
+    @Override
+    public Map<String, Object> getDailyChartData(int year, int month) {
+        int daysInMonth = LocalDate.of(year, month, 1).lengthOfMonth();
+        int[] enterCounts = new int[daysInMonth];
+        int[] pickupCounts = new int[daysInMonth];
+
+        String startDate = String.format("%d-%02d-01", year, month);
+        String endDate = month == 12
+                ? String.format("%d-01-01", year + 1)
+                : String.format("%d-%02d-01", year, month + 1);
+
+        List<InboundPackage> inbounds = inboundPackageMapper.selectList(
+                new QueryWrapper<InboundPackage>()
+                        .ge("enter_time", startDate)
+                        .lt("enter_time", endDate));
+        for (InboundPackage ib : inbounds) {
+            if (ib.getEnterTime() != null) {
+                int day = ib.getEnterTime().getDayOfMonth() - 1;
+                enterCounts[day]++;
+                if ("CHECKED_OUT".equals(ib.getStatus())) {
+                    pickupCounts[day]++;
+                }
+            }
+        }
+
+        List<String> labels = new ArrayList<>();
+        List<Integer> enterData = new ArrayList<>();
+        List<Integer> pickupData = new ArrayList<>();
+        for (int i = 0; i < daysInMonth; i++) {
+            labels.add((i + 1) + "日");
+            enterData.add(enterCounts[i]);
+            pickupData.add(pickupCounts[i]);
+        }
+
+        Map<String, Object> chart = new LinkedHashMap<>();
+        chart.put("labels", labels);
+        chart.put("enterData", enterData);
+        chart.put("pickupData", pickupData);
+        return chart;
+    }//生成日度图表数据接口
 }

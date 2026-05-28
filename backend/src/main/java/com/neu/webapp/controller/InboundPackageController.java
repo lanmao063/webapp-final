@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
-@RestController
+@RestController//返回数据而非跳转网页
 @RequestMapping("/inbound")
 public class InboundPackageController {
 
@@ -19,21 +19,21 @@ public class InboundPackageController {
         this.inboundPackageService = inboundPackageService;
     }
 
-    @PutMapping("/{trackingNumber}/warehouse-entry")
+    @PutMapping("/{trackingNumber}/warehouse-entry")//入库登记
     public Result<String> warehouseEntry(@PathVariable String trackingNumber, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         String pickupCode = inboundPackageService.warehouseEntry(trackingNumber, userId);
         return Result.ok(pickupCode);
     }
 
-    @PutMapping("/{trackingNumber}/checkout")
+    @PutMapping("/{trackingNumber}/checkout")//出库
     public Result<Void> checkout(@PathVariable String trackingNumber, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         inboundPackageService.checkout(trackingNumber, userId);
         return Result.ok();
     }
 
-    @GetMapping("/search")
+    @GetMapping("/search")//单号查询
     public Result<Map<String, Object>> search(@RequestParam String trackingNumber, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         Map<String, Object> data = inboundPackageService.searchByTrackingNumber(trackingNumber, userId);
@@ -43,20 +43,20 @@ public class InboundPackageController {
         return Result.ok(data);
     }
 
-    @GetMapping("/my-pickup-codes")
+    @GetMapping("/my-pickup-codes")//我的取件码 
     public Result<List<Map<String, Object>>> myPickupCodes(HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         return Result.ok(inboundPackageService.myPickupCodes(userId));
     }
 
-    @PutMapping("/{id}/authorize-proxy")
+    @PutMapping("/{id}/authorize-proxy")//授权代理取件
     public Result<Void> authorizeProxy(@PathVariable Long id, @RequestBody Map<String, String> body, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
         inboundPackageService.authorizeProxy(id, userId, body.get("proxyPhone"));
         return Result.ok();
     }
 
-    @GetMapping("/public-search")
+    @GetMapping("/public-search")//公开查询，用于取件查询快递
     public Result<Map<String, Object>> publicSearch(@RequestParam String trackingNumber,
                                                      @RequestParam String phone) {
         Map<String, Object> data = inboundPackageService.publicSearch(trackingNumber, phone);
@@ -66,7 +66,7 @@ public class InboundPackageController {
         return Result.ok(data);
     }
 
-    @PutMapping("/public-checkout")
+    @PutMapping("/public-checkout")//公开出库，用于取件
     public Result<Map<String, Object>> publicCheckout(@RequestBody Map<String, String> body) {
         String trackingNumber = body.get("trackingNumber");
         String phone = body.get("phone");
@@ -80,7 +80,7 @@ public class InboundPackageController {
         return Result.ok(data);
     }
 
-    @GetMapping("/auto-checkout-list")
+    @GetMapping("/auto-checkout-list")//自动出库列表
     public Result<IPage<Map<String, Object>>> autoCheckoutList(
             @RequestParam(required = false) String keyword,
             @RequestParam(defaultValue = "1") int page,

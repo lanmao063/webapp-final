@@ -14,13 +14,6 @@
           <el-form-item label="密码" prop="password">
             <el-input v-model="loginForm.password" type="password" placeholder="请输入密码" show-password clearable />
           </el-form-item>
-          <el-form-item label="角色" prop="role">
-            <el-select v-model="loginForm.role" placeholder="请选择角色" class="w-full">
-              <el-option label="普通用户" value="REGULAR" />
-              <el-option label="快递员" value="COURIER" />
-              <el-option label="驿站管理员" value="MANAGER" />
-            </el-select>
-          </el-form-item>
           <el-form-item>
             <el-checkbox v-model="loginForm.rememberMe">记住密码</el-checkbox>
           </el-form-item>
@@ -59,7 +52,6 @@ const loading = ref(false)
 const loginForm = reactive({
   username: '',
   password: '',
-  role: 'REGULAR',
   rememberMe: false
 })
 
@@ -74,8 +66,7 @@ onMounted(() => {
 
 const rules = {
   username: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-  password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
-  role: [{ required: true, message: '请选择角色', trigger: 'change' }]
+  password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
 }
 
 const handleLogin = async () => {
@@ -85,8 +76,7 @@ const handleLogin = async () => {
   try {
     const res = await request.post('/auth/login', {
       username: loginForm.username,
-      password: loginForm.password,
-      role: loginForm.role
+      password: loginForm.password
     })
     const { userId, username, role } = res.data
     setUserInfo({ userId, username, role })

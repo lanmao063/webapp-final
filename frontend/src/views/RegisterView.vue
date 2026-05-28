@@ -1,41 +1,44 @@
 <template>
-  <div class="auth-container">
-    <el-card class="auth-card">
-      <div class="auth-title">
-        <el-icon :size="36" color="var(--color-primary)"><UserFilled /></el-icon>
-        <h2>用户注册</h2>
-      </div>
-      <el-form :model="registerForm" :rules="rules" ref="formRef" label-width="80px">
-        <el-form-item label="用户名" prop="username">
-          <el-input v-model="registerForm.username" placeholder="小于12字" maxlength="12" clearable />
-        </el-form-item>
-        <el-form-item label="密码" prop="password">
-          <el-input v-model="registerForm.password" type="password" placeholder="6-20位密码" minlength="6" maxlength="20" show-password clearable />
-        </el-form-item>
-        <el-form-item label="确认密码" prop="repassword">
-          <el-input v-model="registerForm.repassword" type="password" placeholder="请再次输入密码" maxlength="20" show-password clearable />
-        </el-form-item>
-        <el-form-item label="角色" prop="role">
-          <el-select v-model="registerForm.role" placeholder="请选择角色" class="w-full">
-            <el-option label="普通用户" value="REGULAR" />
-            <el-option label="快递员" value="COURIER" />
-            <el-option label="驿站管理员" value="MANAGER" />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="工号" prop="idNumber" v-if="registerForm.role !== 'REGULAR'">
-          <el-input v-model="registerForm.idNumber" placeholder="员工填写，至少3位" clearable />
-        </el-form-item>
-        <el-form-item label="电话" prop="phone">
-          <el-input v-model="registerForm.phone" placeholder="请输入手机号" clearable />
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="handleRegister" :loading="loading" class="w-full">注册</el-button>
-        </el-form-item>
-      </el-form>
-      <div class="auth-links">
-        <el-button type="primary" link @click="$router.push('/login')">返回登录</el-button>
-      </div>
-    </el-card>
+  <div class="login-page">
+    <div class="login-image-panel"></div>
+    <div class="login-form-panel">
+      <el-card class="auth-card">
+        <div class="auth-title">
+          <el-icon :size="36" color="var(--color-primary)"><UserFilled /></el-icon>
+          <h2>用户注册</h2>
+        </div>
+        <el-form :model="registerForm" :rules="rules" ref="formRef" label-width="80px">
+          <el-form-item label="用户名" prop="username">
+            <el-input v-model="registerForm.username" placeholder="小于12字" maxlength="12" clearable />
+          </el-form-item>
+          <el-form-item label="密码" prop="password">
+            <el-input v-model="registerForm.password" type="password" placeholder="6-20位密码" minlength="6" maxlength="20" show-password clearable />
+          </el-form-item>
+          <el-form-item label="确认密码" prop="repassword">
+            <el-input v-model="registerForm.repassword" type="password" placeholder="请再次输入密码" maxlength="20" show-password clearable />
+          </el-form-item>
+          <el-form-item label="角色" prop="role">
+            <el-select v-model="registerForm.role" placeholder="请选择角色" class="w-full">
+              <el-option label="普通用户" value="REGULAR" />
+              <el-option label="快递员" value="COURIER" />
+              <el-option label="驿站管理员" value="MANAGER" />
+            </el-select>
+          </el-form-item>
+          <el-form-item label="工号" prop="idNumber" v-if="registerForm.role !== 'REGULAR'">
+            <el-input v-model="registerForm.idNumber" placeholder="员工填写，至少3位" clearable />
+          </el-form-item>
+          <el-form-item label="电话" prop="phone">
+            <el-input v-model="registerForm.phone" placeholder="请输入手机号" clearable />
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="handleRegister" :loading="loading" class="w-full">注册</el-button>
+          </el-form-item>
+        </el-form>
+        <div class="auth-links">
+          <el-button type="primary" link @click="$router.push('/login')">返回登录</el-button>
+        </div>
+      </el-card>
+    </div>
   </div>
 </template>
 
@@ -111,4 +114,73 @@ const handleRegister = async () => {
 </script>
 
 <style scoped>
+.login-page {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.login-image-panel {
+  flex: 0 0 50%;
+  width: 50%;
+  height: 100vh;
+  background: url('@/assets/login.png') center/cover no-repeat;
+  position: relative;
+}
+.login-image-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, transparent 65%, #f0f2f5 100%);
+}
+
+.login-form-panel {
+  flex: 0 0 50%;
+  width: 50%;
+  height: 100vh;
+  background: #f0f2f5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  overflow-y: auto;
+}
+
+.auth-card {
+  width: 420px;
+  max-width: 90vw;
+  border-radius: var(--radius-lg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, .08);
+}
+
+.auth-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: var(--spacing-lg);
+}
+.auth-title h2 {
+  font-size: var(--font-size-xxl);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.auth-links {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-sm);
+}
+
+@media (max-width: 768px) {
+  .login-image-panel {
+    display: none;
+  }
+  .login-form-panel {
+    flex: 1;
+    padding: 20px;
+  }
+}
 </style>
