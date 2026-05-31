@@ -20,11 +20,11 @@
       </div>
     </el-card>
 
-    <!-- 提示卡片（欠款/待审批/待揽收） -->
-    <el-card v-if="hintCard.show" shadow="hover" class="hint-card" @click="$router.push(hintCard.link)">
+    <!-- 提示卡片（欠款/待审批/待揽收/异常处理） -->
+    <el-card v-for="(card, idx) in hintCards" :key="idx" shadow="hover" class="hint-card" @click="$router.push(card.link)">
       <div class="hint-content">
-        <span class="hint-text">{{ hintCard.text }}</span>
-        <el-button type="warning" size="small" @click.stop="$router.push(hintCard.link)">{{ hintCard.btnText }}</el-button>
+        <span class="hint-text">{{ card.text }}</span>
+        <el-button type="warning" size="small" @click.stop="$router.push(card.link)">{{ card.btnText }}</el-button>
       </div>
     </el-card>
 
@@ -144,6 +144,7 @@ const pickupList = ref([])
 const unpaidCount = ref(0)
 const pendingApprovalCount = ref(0)
 const pendingCollectCount = ref(0)
+const unresolvedErrorCount = ref(0)
 const stats = reactive({ todayDeliveries: 0, todayWarehoused: 0 })
 
 const cards = reactive([
@@ -160,17 +161,23 @@ const greeting = computed(() => {
   return `${prefix}，${name}`
 })
 
-const hintCard = computed(() => {
+const hintCards = computed(() => {
+  const cards = []
   if (role.value === 'REGULAR' && unpaidCount.value > 0) {
-    return { show: true, text: `您有 ${unpaidCount.value} 笔待付款订单`, btnText: '去付款', link: '/MyUnpaid' }
+    cards.push({ text: `您有 ${unpaidCount.value} 笔待付款订单`, btnText: '去付款', link: '/MyUnpaid' })
   }
   if (role.value === 'COURIER' && pendingCollectCount.value > 0) {
-    return { show: true, text: `您有 ${pendingCollectCount.value} 笔待揽收订单`, btnText: '去揽收', link: '/PickupQuery' }
+    cards.push({ text: `您有 ${pendingCollectCount.value} 笔待揽收订单`, btnText: '去揽收', link: '/PickupQuery' })
   }
-  if (role.value === 'MANAGER' && pendingApprovalCount.value > 0) {
-    return { show: true, text: `有 ${pendingApprovalCount.value} 笔寄件申请待审批`, btnText: '去审批', link: '/SendManage' }
+  if (role.value === 'MANAGER') {
+    if (unresolvedErrorCount.value > 0) {
+      cards.push({ text: `有 ${unresolvedErrorCount.value} 条未处理异常`, btnText: '去处理', link: '/ErrorHandle' })
+    }
+    if (pendingApprovalCount.value > 0) {
+      cards.push({ text: `有 ${pendingApprovalCount.value} 笔寄件申请待审批`, btnText: '去审批', link: '/SendManage' })
+    }
   }
-  return { show: false, text: '', btnText: '', link: '' }
+  return cards
 })
 
 const proxyDialogVisible = ref(false)
@@ -237,6 +244,7 @@ onMounted(async () => {
       cards[1].value = overview.data.totalPickedUp
       cards[2].value = overview.data.totalCollected
       cards[3].value = overview.data.unresolvedErrors
+      unresolvedErrorCount.value = overview.data.unresolvedErrors || 0
       pendingApprovalCount.value = pending.data.total || 0
     }
   } catch {} finally {

@@ -78,8 +78,8 @@ const handleLogin = async () => {
       username: loginForm.username,
       password: loginForm.password
     })
-    const { userId, username, role } = res.data
-    setUserInfo({ userId, username, role })
+    const { userId, username, role, realName, phone, address } = res.data
+    setUserInfo({ userId, username, role, realName, phone, address })
     if (loginForm.rememberMe) {
       saveCredentials(loginForm.username, loginForm.password)
     } else {

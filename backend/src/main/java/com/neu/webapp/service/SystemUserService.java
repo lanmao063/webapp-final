@@ -19,5 +19,5 @@ public interface SystemUserService extends IService<SystemUser> {
 
     UserInfo getCurrentUserInfo(Long userId);
 
-    void updateProfile(Long userId, String realName, String phone, String address, String avatar);
+    void updateProfile(Long userId, String username, String realName, String phone, String address, String avatar, HttpSession session);
 }

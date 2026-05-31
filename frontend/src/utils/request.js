@@ -1,6 +1,7 @@
 import axios from 'axios'
 import { ElMessage } from 'element-plus'
 import { clearAuth } from './auth'
+import { transformDates } from './date'
 
 const request = axios.create({
   baseURL: '/webapp',
@@ -15,7 +16,8 @@ request.interceptors.response.use(
       ElMessage.error(data.message || '请求失败')
       return Promise.reject(new Error(data.message))
     }
-    return data
+    // 自动将返回值中所有 ISO 日期字符串转为可读格式
+    return transformDates(data)
   },
   error => {
     if (error.response && error.response.status === 401) {

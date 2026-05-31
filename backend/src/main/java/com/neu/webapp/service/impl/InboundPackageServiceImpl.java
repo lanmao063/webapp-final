@@ -40,7 +40,10 @@ public class InboundPackageServiceImpl extends ServiceImpl<InboundPackageMapper,
         InboundPackage inbound = baseMapper.selectOne(
                 new QueryWrapper<InboundPackage>().eq("package_id", pkg.getId()));//查询是否已入库
         if (inbound == null) {
-            throw new BusinessException("该包裹未预录入入库信息");
+            // 运输中的包裹，扫描入库时自动创建 inbound 记录
+            inbound = new InboundPackage();
+            inbound.setPackageId(pkg.getId());
+            baseMapper.insert(inbound);
         }
         if ("IN_WAREHOUSE".equals(inbound.getStatus())) {
             throw new BusinessException("该包裹已入库，请勿重复操作");
@@ -277,14 +280,14 @@ public class InboundPackageServiceImpl extends ServiceImpl<InboundPackageMapper,
         inbound.setOutTime(LocalDateTime.now());
         baseMapper.updateById(inbound);
 
-        // 查询同一收件人仍在库的包裹
+        // 查询当前取件人仍在库的包裹（含本人收件和代取）
         List<InboundPackage> remainingInbounds = baseMapper.selectList(
                 new QueryWrapper<InboundPackage>().eq("status", "IN_WAREHOUSE"));
         List<Map<String, Object>> remainingPackages = new ArrayList<>();
         for (InboundPackage ib : remainingInbounds) {
             if (ib.getId().equals(inbound.getId())) continue;
             Package rp = packageMapper.selectById(ib.getPackageId());
-            if (rp != null && receiverPhone.equals(rp.getReceiverPhone())) {
+            if (rp != null && (phone.equals(rp.getReceiverPhone()) || phone.equals(ib.getProxyPhone()))) {
                 Map<String, Object> item = new LinkedHashMap<>();
                 item.put("trackingNumber", rp.getTrackingNumber());
                 item.put("pickupCode", ib.getPickupCode());

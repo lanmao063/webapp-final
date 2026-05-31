@@ -21,6 +21,11 @@
               <el-input-number v-model="form.weight" :min="0" :precision="3" class="w-full" />
             </el-form-item>
           </el-col>
+          <el-col :span="12">
+            <el-form-item label="体积(cm³)" prop="volume">
+              <el-input-number v-model="form.volume" :min="0" :step="500" :precision="0" class="w-full" placeholder="包裹体积（立方厘米）" />
+            </el-form-item>
+          </el-col>
         </el-row>
         <el-row :gutter="20">
           <el-col :span="12">
@@ -34,7 +39,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="寄件人地址">
+        <el-form-item label="寄件人地址" prop="senderAddress">
           <el-input v-model="form.senderAddress" placeholder="请输入寄件人地址" />
         </el-form-item>
         <el-row :gutter="20">
@@ -49,7 +54,7 @@
             </el-form-item>
           </el-col>
         </el-row>
-        <el-form-item label="收件人地址">
+        <el-form-item label="收件人地址" prop="receiverAddress">
           <el-input v-model="form.receiverAddress" placeholder="请输入收件人地址" />
         </el-form-item>
         <el-form-item label="备注">
@@ -120,7 +125,7 @@ const packageTypes = [
 ]
 
 const form = reactive({
-  packageName: '', weight: null, senderName: '', senderPhone: '',
+  packageName: '', weight: null, volume: null, senderName: '', senderPhone: '',
   senderAddress: '', receiverName: '', receiverPhone: '', receiverAddress: '',
   notes: '', pickupMethod: 'SELF_DROP', appointmentTime: ''
 })
@@ -130,6 +135,7 @@ const user = getUserInfo()
 if (user) {
   form.senderName = user.realName || ''
   form.senderPhone = user.phone || ''
+  form.senderAddress = user.address || ''
 }
 
 watch(() => form.pickupMethod, (val) => {
@@ -146,8 +152,10 @@ const rules = computed(() => ({
   weight: [{ required: true, message: '请输入重量', trigger: 'blur' }],
   senderName: [{ required: true, message: '请输入寄件人', trigger: 'blur' }],
   senderPhone: [{ required: true, pattern: /^1[3-9]\d{9}$/, message: '手机号格式不正确', trigger: 'blur' }],
+  senderAddress: [{ required: true, message: '请输入寄件人地址', trigger: 'blur' }],
   receiverName: [{ required: true, message: '请输入收件人', trigger: 'blur' }],
   receiverPhone: [{ required: true, pattern: /^1[3-9]\d{9}$/, message: '手机号格式不正确', trigger: 'blur' }],
+  receiverAddress: [{ required: true, message: '请输入收件人地址', trigger: 'blur' }],
   pickupMethod: [{ required: true, message: '请选择取件方式', trigger: 'change' }],
   appointmentTime: form.pickupMethod === 'DOOR_PICKUP'
     ? [{ required: true, message: '请选择预约时间', trigger: 'change' }]
@@ -162,6 +170,7 @@ const handleSubmit = async () => {
     const res = await request.post('/send-package', {
       packageName: form.packageName,
       weight: form.weight,
+      volume: form.volume,
       senderName: form.senderName,
       senderPhone: form.senderPhone,
       senderAddress: form.senderAddress,

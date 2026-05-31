@@ -1,5 +1,6 @@
 package com.neu.webapp.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
@@ -40,7 +41,8 @@ public class SystemUserServiceImpl extends ServiceImpl<SystemUserMapper, SystemU
         session.setAttribute("userId", user.getId());
         session.setAttribute("username", user.getUsername());
         session.setAttribute("role", user.getRole());
-        return new LoginResponse(user.getId(), user.getUsername(), user.getRole());
+        return new LoginResponse(user.getId(), user.getUsername(), user.getRole(),
+                user.getRealName(), user.getPhone(), user.getAddress());
     }
 
     @Override
@@ -94,20 +96,32 @@ public class SystemUserServiceImpl extends ServiceImpl<SystemUserMapper, SystemU
 
     @Override
     @Transactional
-    public void updateProfile(Long userId, String realName, String phone, String address, String avatar) {
+    public void updateProfile(Long userId, String username, String realName, String phone, String address, String avatar, HttpSession session) {
         SystemUser user = baseMapper.selectById(userId);
         if (user == null) {
             throw new BusinessException("用户不存在");
         }
+        if (username == null || username.isBlank()) {
+            throw new BusinessException("用户名不能为空");
+        }
         if (phone == null || phone.isBlank()) {
             throw new BusinessException("手机号不能为空");
         }
+        // 检查用户名是否被其他用户占用
+        SystemUser existUser = baseMapper.selectOne(
+                new LambdaQueryWrapper<SystemUser>().eq(SystemUser::getUsername, username));
+        if (existUser != null && !existUser.getId().equals(userId)) {
+            throw new BusinessException("该用户名已被占用");
+        }
         LambdaUpdateWrapper<SystemUser> wrapper = new LambdaUpdateWrapper<>();
         wrapper.eq(SystemUser::getId, userId)
+                .set(SystemUser::getUsername, username)
                 .set(SystemUser::getRealName, realName)
                 .set(SystemUser::getPhone, phone)
                 .set(SystemUser::getAddress, address)
                 .set(avatar != null, SystemUser::getAvatar, avatar);
         baseMapper.update(null, wrapper);
+        // 同步 session 中的 username
+        session.setAttribute("username", username);
     }
 }

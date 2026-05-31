@@ -54,7 +54,7 @@ public class AuthController {
     @PutMapping("/profile")
     public Result<?> updateProfile(@RequestBody UpdateProfileRequest request, HttpSession session) {
         Long userId = (Long) session.getAttribute("userId");
-        systemUserService.updateProfile(userId, request.getRealName(), request.getPhone(), request.getAddress(), request.getAvatar());
+        systemUserService.updateProfile(userId, request.getUsername(), request.getRealName(), request.getPhone(), request.getAddress(), request.getAvatar(), session);
         return Result.ok();
     }
 }

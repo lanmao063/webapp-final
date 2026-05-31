@@ -45,8 +45,8 @@
       </template>
 
       <el-form :model="form" ref="formRef" label-width="80px" :rules="formRules">
-        <el-form-item label="用户名">
-          <el-input :model-value="userInfo?.username" disabled />
+        <el-form-item label="用户名" prop="username">
+          <el-input v-model="form.username" placeholder="请输入用户名" />
         </el-form-item>
         <el-form-item label="角色">
           <el-input :model-value="roleLabel" disabled />
@@ -80,6 +80,7 @@ const saving = ref(false)
 const selectedAvatar = ref('')
 
 const form = reactive({
+  username: '',
   realName: '',
   phone: '',
   address: ''
@@ -93,6 +94,10 @@ const keys = getAvatarKeys()
 availableAvatars.value = keys.map(k => ({ key: k, url: getAvatarUrl(k) }))
 
 const formRules = {
+  username: [
+    { required: true, message: '用户名不能为空', trigger: 'blur' },
+    { min: 2, max: 20, message: '用户名长度在 2 到 20 个字符之间', trigger: 'blur' }
+  ],
   phone: [
     { required: true, message: '手机号不能为空', trigger: 'blur' },
     { pattern: /^1\d{10}$/, message: '请输入正确的手机号', trigger: 'blur' }
@@ -104,6 +109,7 @@ onMounted(async () => {
     const res = await request.get('/auth/current')
     userInfo.value = res.data
     roleLabel.value = roleLabelMap[userInfo.value.role] || ''
+    form.username = userInfo.value.username || ''
     form.realName = userInfo.value.realName || ''
     form.phone = userInfo.value.phone || ''
     form.address = userInfo.value.address || ''
@@ -123,6 +129,7 @@ const handleSave = async () => {
   saving.value = true
   try {
     await request.put('/auth/profile', {
+      username: form.username,
       realName: form.realName,
       phone: form.phone,
       address: form.address,
